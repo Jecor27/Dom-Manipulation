@@ -87,7 +87,8 @@ subMenuEl.style.top = "0";
 //Adding Menu Interaction
 //Select and cache the all of the <a> elements inside of 
 // topMenuEl in a variable named topMenuLinks.
-let topMenuLinks = topMenuEl.querySelectorAll("a");
+let topMenuLinks = topMenuEl.querySelectorAll("#top-menu a");
+let submenuLinks = {};
 
 /*2. Attach a delegated 'click' event listener to topMenuEl.
 The first line of code of the event listener function should call the event object's preventDefault() method.
@@ -99,11 +100,66 @@ topMenuEl.addEventListener("click", function(event) {
     if(!event.target.matches("a")) {
       return;
     }
-    const clickedLink = event.target;
+    const z = event.target;
+    
     topMenuLinks.forEach((link) => {
       link.classList.remove("active");
     });
-})  
 
+    z.classList.toggle("active");
+    //console.log(z); //clicking ABOUT, CATALOG, etc. will log about, catalog, etc. when a link is clicked. 
+    // Clicking anywhere other than on a link should do nothing.
+    
+    //Part 5: Adding Submenu Interaction
 
+    const clickedLinkObject = menuLinks.find((linkObject) => linkObject.text === z.textContent);
+    //searching through the array, and checking to see if text property matches the text content of the element z from earlier.
+ 
+    if (clickedLinkObject && clickedLinkObject.subLinks) {
+      if (submenuLinks[clickedLinkObject.text]) {
+        subMenuEl.style.top = "0";  
+        subMenuEl.innerHTML = ''; 
+        submenuLinks[clickedLinkObject.text] = false;
+      } else {
+        subMenuEl.style.top = "100%"; 
+        buildSubmenu(clickedLinkObject.subLinks);
+        submenuLinks[clickedLinkObject.text] = true;
+      }
+    } else {
+      subMenuEl.style.top = "0";
+      subMenuEl.innerHTML = ''; 
+    }
+  
+    if (event.target.textContent === "about") {
+      mainEl.innerHTML = "<h1>About</h1>";
+    } else {
+      mainEl.innerHTML = `<h1>${event.target.textContent}</h1>`;
+    }
+    // Log the content of the <a> to verify the handler is working.
+    //console.log("Clicked link text: ", event.target.textContent);
+})
 
+function buildSubmenu(subLinks) {
+    subMenuEl.innerHTML = '';
+    for (let link of subLinks) {
+      let subLinkElement = document.createElement("a");
+      subLinkElement.setAttribute("href", link.href);
+      subLinkElement.textContent = link.text;
+      subMenuEl.appendChild(subLinkElement);
+    }
+  }
+  
+  subMenuEl.addEventListener("click", (event) => {
+    event.preventDefault();
+    if(!event.target.matches("a")) {
+      return;
+    }
+    subMenuEl.style.top = "0";
+    topMenuLinks.forEach((link) => {
+      link.classList.remove("active");
+    });
+    mainEl.innerHTML = `<h1>${event.target.textContent}</h1>`;
+  
+    // Log the content of the <a> to verify the handler is working.
+    console.log("Clicked link text: ", event.target.textContent);
+  })
